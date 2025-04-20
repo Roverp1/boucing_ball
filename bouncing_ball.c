@@ -41,13 +41,19 @@ void restore_terminal();
 MovementVector get_movement_vector(SpriteDirection sprite_direction);
 SpriteDirection flip_horizontal_direction(SpriteDirection direction);
 SpriteDirection flip_vertical_direction(SpriteDirection direction);
+SpritePositioning update_sprite_position(SpritePositioning current_position,
+                                         int max_row, int max_col);
 
-int main() {
+void test_update_sprite_position(void);
+
+int main(void) {
   struct winsize terminal_size;
 
   Sprite soccerBallSprite = load_sprite_from_file("./assets/soccer_ball.txt");
 
   perform_terminal_setup_for_animation();
+
+  test_update_sprite_position();
 
   return 0;
 }
@@ -142,4 +148,39 @@ SpriteDirection flip_vertical_direction(SpriteDirection direction) {
   default:
     assert(0 && "Ureachable: invalid SpriteDirection");
   }
+}
+
+SpritePositioning update_sprite_position(SpritePositioning current_position,
+                                         int max_row, int max_col) {
+  if (current_position.position_row <= 0 ||
+      current_position.position_row >= max_row)
+    current_position.direction =
+        flip_vertical_direction(current_position.direction);
+
+  if (current_position.position_column <= 0 ||
+      current_position.position_column >= max_col)
+    current_position.direction =
+        flip_horizontal_direction(current_position.direction);
+
+  const MovementVector movement_vector =
+      get_movement_vector(current_position.direction);
+
+  current_position.position_row += movement_vector.dy;
+  current_position.position_column += movement_vector.dx;
+
+  return current_position;
+}
+
+void test_update_sprite_position(void) {
+  SpritePositioning testSprite = {
+      .position_row = 0, .position_column = 5, .direction = DIRECTION_UP_LEFT};
+
+  SpritePositioning resultSprite = update_sprite_position(testSprite, 20, 40);
+
+  printf("Expected direction: DIRECTION_DOWN_LEFT (%d)\n", DIRECTION_DOWN_LEFT);
+  printf("Actual direction:   %d\n", resultSprite.direction);
+  printf("Expected row: 1\n");
+  printf("Actual row:   %d\n", resultSprite.position_row);
+  printf("Expected col: 4\n");
+  printf("Actual col:   %d\n", resultSprite.position_column);
 }
