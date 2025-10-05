@@ -191,6 +191,7 @@ void draw_sprite(const Sprite *sprite,
   fflush(stdout);
 }
 
+// recursive function
 void draw_sprite_recursive(const Sprite *sprite,
                            const SpritePositioning *spritePosition,
                            unsigned short line_index) {
